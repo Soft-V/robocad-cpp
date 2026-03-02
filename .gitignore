@@ -17,4 +17,5 @@ bld/
 out/
 # Visual Studio 2019 cache/options directory
 .vs/
+.vscode/
 build/
