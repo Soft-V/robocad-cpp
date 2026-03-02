@@ -26,7 +26,8 @@ Robot::~Robot() {
 	if (log_file.is_open()) {
 		log_file.close();
 	}
-	free(robot_info);
+	delete robot_info;
+	robot_info = NULL;
 }
 
 const std::string currentDateTime() {
