@@ -105,6 +105,8 @@ void RpiUpdater::updater()
                 robot->robot_info->cpu_load = cpu_load;
                 robot->robot_info->memory_load = memory_load;
             }
+
+            std::this_thread::sleep_for(std::chrono::milliseconds(500));
         }
         catch (const std::exception& e) 
         {
@@ -132,6 +134,8 @@ void RepkaUpdater::updater()
                 robot->robot_info->cpu_load = cpu_load;
                 robot->robot_info->memory_load = memory_load;
             }
+
+            std::this_thread::sleep_for(std::chrono::milliseconds(500));
         }
         catch (const std::exception& e) 
         {
