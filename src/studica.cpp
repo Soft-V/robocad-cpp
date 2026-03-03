@@ -133,15 +133,15 @@ std::vector<float> RobotVmxTitan::get_lidar()
 // port is from 1 to 10 included
 void RobotVmxTitan::set_servo_angle(float angle, int pin)
 {
-    studica_internal->set_servo_angle(angle, pin);
+    studica_internal->set_servo_angle(angle, pin - 1);
 }
 // port is from 1 to 10 included
 void RobotVmxTitan::set_led_state(bool state, int pin)
 {
-    studica_internal->set_led_state(state, pin);
+    studica_internal->set_led_state(state, pin - 1);
 }
 // port is from 1 to 10 included
 void RobotVmxTitan::set_servo_pwm(float pwm, int pin)
 {
-    studica_internal->set_servo_pwm(pwm, pin);
+    studica_internal->set_servo_pwm(pwm, pin - 1);
 }
