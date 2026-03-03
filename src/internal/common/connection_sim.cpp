@@ -49,7 +49,17 @@ cv::Mat ConnectionSim::get_camera()
     return cv::Mat();
 }
 
-float* ConnectionSim::get_lidar()
+std::vector<float> ConnectionSim::get_lidar()
 {
-    return NULL;
+    return std::vector<float>();
+}
+
+void ConnectionSim::set_data(std::vector<uint8_t> data)
+{
+    talk_channel->set_bytes_safe(data);
+}
+
+std::vector<uint8_t> ConnectionSim::get_data()
+{
+    return listen_channel->get_bytes_safe();
 }

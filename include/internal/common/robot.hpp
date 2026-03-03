@@ -4,28 +4,28 @@
 #include <string>
 #include <mutex>
 #include <fstream>
-
+	
 class RobotInfo
 {
 public:
-	float spi_time_dev = 0;
-	float rx_spi_time_dev = 0;
-	float tx_spi_time_dev = 0;
-	float spi_count_dev = 0;
-	float com_time_dev = 0;
-	float rx_com_time_dev = 0;
-	float tx_com_time_dev = 0;
-	float com_count_dev = 0;
-	float temperature = 0;
-	float memory_load = 0;
-	float cpu_load = 0;
+	std::atomic<float> spi_time_dev = 0;
+	std::atomic<float> rx_spi_time_dev = 0;
+	std::atomic<float> tx_spi_time_dev = 0;
+	std::atomic<float> spi_count_dev = 0;
+	std::atomic<float> com_time_dev = 0;
+	std::atomic<float> rx_com_time_dev = 0;
+	std::atomic<float> tx_com_time_dev = 0;
+	std::atomic<float> com_count_dev = 0;
+	std::atomic<float> temperature = 0;
+	std::atomic<float> memory_load = 0;
+	std::atomic<float> cpu_load = 0;
 };
 
 class Robot 
 {
 public:
-	bool on_real_robot;
-	float power;
+	std::atomic<bool> on_real_robot;
+	std::atomic<float> power;
 	RobotInfo* robot_info;
 
 	Robot(bool on_real_robot, RobotConfiguration* conf);

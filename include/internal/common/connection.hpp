@@ -236,4 +236,10 @@ public:
         if (sct != INVALID_SCT) shutdown(sct, SHUT_RDWR);
         if (worker.joinable()) worker.join();
     }
+
+    void set_bytes_safe(std::vector<uint8_t> bytes) 
+    {
+        std::lock_guard<std::mutex> lock(bytes_mutex);
+        out_bytes = std::move(bytes);
+    }
 };

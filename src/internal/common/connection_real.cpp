@@ -75,7 +75,7 @@ cv::Mat ConnectionReal::get_camera()
     return frame;
 }
 
-float* ConnectionReal::get_lidar()
+std::vector<float> ConnectionReal::get_lidar()
 {
     try
     {
@@ -85,7 +85,7 @@ float* ConnectionReal::get_lidar()
     {
         // pass
     }
-    return NULL;
+    return std::vector<float>();
 }
 
 int ConnectionReal::spi_ini(const std::string& path, int channel, int speed, int mode)
@@ -98,14 +98,24 @@ int ConnectionReal::com_ini(const std::string& path, int baud)
     return lib_holder->init_usb(path, baud);
 }
 
-uint8_t* ConnectionReal::spi_rw(uint8_t* data, unsigned int len)
+std::vector<uint8_t> ConnectionReal::spi_rw(std::vector<uint8_t>& data)
 {
-    return lib_holder->rw_spi(data, len);
+    std::vector<uint8_t> buffer = data;
+    unsigned char* ptr = buffer.data();
+    unsigned int len = buffer.size();
+
+    unsigned char* result_ptr = lib_holder->rw_spi(ptr, len);
+    return std::vector<uint8_t>(result_ptr, result_ptr + len);
 }
 
-uint8_t* ConnectionReal::com_rw(uint8_t* data, unsigned int len)
+std::vector<uint8_t> ConnectionReal::com_rw(std::vector<uint8_t>& data)
 {
-    return lib_holder->rw_usb(data, len);
+    std::vector<uint8_t> buffer = data;
+    unsigned char* ptr = buffer.data();
+    unsigned int len = buffer.size();
+
+    unsigned char* result_ptr = lib_holder->rw_usb(ptr, len);
+    return std::vector<uint8_t>(result_ptr, result_ptr + len);
 }
 
 void ConnectionReal::spi_stop()

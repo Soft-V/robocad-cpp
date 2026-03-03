@@ -6,14 +6,14 @@ class Updater
 {
 public:
     Robot* robot;
-    bool stop_robot_info_thread = false;
+    std::atomic<bool> stop_robot_info_thread = false;
 
     Updater(Robot* robot);
 
     virtual void updater();
 };
 
-class RpiUpdater : Updater
+class RpiUpdater : public Updater
 {
 public:
     RpiUpdater(Robot* robot);
@@ -21,7 +21,7 @@ public:
     void updater() override;
 };
 
-class RepkaUpdater : Updater
+class RepkaUpdater : public Updater
 {
 public:
     RepkaUpdater(Robot* robot);

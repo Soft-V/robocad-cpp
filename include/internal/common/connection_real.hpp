@@ -4,6 +4,7 @@
 #include "robot.hpp"
 #include "updaters.hpp"
 #include "shared.hpp"
+#include "lidar.hpp"
 #include "robot_configuration.hpp"
 
 #include <thread>
@@ -16,12 +17,12 @@ public:
     ~ConnectionReal();
     void stop() override;
     cv::Mat get_camera() override;
-    float* get_lidar() override;
+    std::vector<float> get_lidar() override;
 
     int spi_ini(const std::string& path, int channel, int speed, int mode);
     int com_ini(const std::string& path, int baud);
-    uint8_t* spi_rw(uint8_t* data, unsigned int len);
-    uint8_t* com_rw(uint8_t* data, unsigned int len);
+    std::vector<uint8_t> spi_rw(std::vector<uint8_t>& data);
+    std::vector<uint8_t> com_rw(std::vector<uint8_t>& data);
     void spi_stop();
     void com_stop();
 

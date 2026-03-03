@@ -7,5 +7,5 @@ class ConnectionBase
 public:
     virtual void stop();
     virtual cv::Mat get_camera();
-    virtual float* get_lidar();
+    virtual std::vector<float> get_lidar();
 };

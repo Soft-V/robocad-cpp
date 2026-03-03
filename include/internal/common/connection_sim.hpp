@@ -17,10 +17,10 @@ public:
     ~ConnectionSim();
     void stop() override;
     cv::Mat get_camera() override;
-    float* get_lidar() override;
+    std::vector<float> get_lidar() override;
 
-    uint8_t* get_data();
-    void set_data(uint8_t* data, unsigned int len);
+    std::vector<uint8_t> get_data();
+    void set_data(std::vector<uint8_t> data);
 
 private:
     const int port_set_data = 65431;

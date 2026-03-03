@@ -14,5 +14,5 @@ public:
     void stop_scan();
     void disconnect();
 
-    float* get_data();
+    std::vector<float> get_data();
 };
