@@ -38,12 +38,13 @@ cv::Mat ConnectionSim::get_camera()
 {
     if (!camera_channel)
         return cv::Mat();
-    std::vector<uint8_t> data = camera_channel->out_bytes;
-    if (data.size() >= 921600)
+    std::vector<uint8_t> data = camera_channel->get_bytes_safe();
+    if (data.size() == 921600)
     {
         cv::Mat img(480, 640, CV_8UC3, data.data());
-        cv::cvtColor(img, img, cv::COLOR_RGB2BGR);
-        return img.clone();
+        cv::Mat img_bgr;
+        cv::cvtColor(img, img_bgr, cv::COLOR_RGB2BGR);
+        return img_bgr;
     }
     return cv::Mat();
 }

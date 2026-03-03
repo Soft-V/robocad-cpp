@@ -158,6 +158,12 @@ public:
         std::lock_guard<std::mutex> lock(bytes_mutex);
         out_bytes.clear();
     }
+
+    std::vector<uint8_t> get_bytes_safe() 
+    {
+        std::lock_guard<std::mutex> lock(bytes_mutex);
+        return out_bytes;
+    }
 };
 
 // --- TalkPort ---
@@ -213,7 +219,6 @@ public:
                 if (!send_all(sct, to_send.data(), len)) break;
             }
 
-            // Читаем 8 байт ответа (два по 4, как в Python)
             char dummy[8];
             if (recv(sct, dummy, 8, 0) <= 0) break;
 
