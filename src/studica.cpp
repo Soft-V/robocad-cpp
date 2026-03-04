@@ -3,8 +3,8 @@
 #include <csignal>
 #include <stdio.h>
 
-RobotVmxTitan* current_instance = nullptr;
-void handler(int signum)
+static RobotVmxTitan* current_instance = nullptr;
+static void handler(int signum)
 {
     current_instance->write_log("Program stopped from handler");
     current_instance->write_log("Signal handler called with signal " + std::to_string(signum));

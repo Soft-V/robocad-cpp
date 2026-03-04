@@ -10,6 +10,10 @@
 #include <atomic>
 #include <mutex>
 
+class ShuffleVariable;
+class CameraVariable;
+class ConnectionHelper;
+
 class Shufflecad
 {
 public:
@@ -61,7 +65,7 @@ public:
     std::string name;
     std::string type;
     std::string direction;
-    std::atomic<std::string> value;
+    std::string value;
 
     ShuffleVariable(std::string name, std::string type, std::string direction)
     {
@@ -73,18 +77,22 @@ public:
 
     void set_bool(bool value)
     {
+        std::lock_guard<std::mutex> lock(this->data_mutex);
         this->value = value ? "1" : "0";
     }
     void set_float(float value)
     {
+        std::lock_guard<std::mutex> lock(this->data_mutex);
         this->value = std::to_string(value);
     }
     void set_string(std::string value)
     {
+        std::lock_guard<std::mutex> lock(this->data_mutex);
         this->value = value;
     }
     void set_radar(std::vector<float> values)
     {
+        std::lock_guard<std::mutex> lock(this->data_mutex);
         std::string val = "";
         for (size_t i = 0; i < values.size(); i++) {
             val += std::to_string(i);
@@ -96,23 +104,28 @@ public:
 
     bool get_bool()
     {
-        return this->value.load() == "1";
+        std::lock_guard<std::mutex> lock(this->data_mutex);
+        return this->value == "1";
     }
     float get_float()
     {
+        std::lock_guard<std::mutex> lock(this->data_mutex);
         return std::stof(this->value);
     }
     std::string get_string()
     {
+        std::lock_guard<std::mutex> lock(this->data_mutex);
         return this->value;
     }
+private:
+    std::mutex data_mutex;
 };
 
 class CameraVariable
 {
 public:
     std::string name;
-    std::atomic<cv::Mat> value;
+    cv::Mat value;
     std::atomic<int> width;
     std::atomic<int> height;
 
@@ -123,6 +136,7 @@ public:
 
     void set_mat(cv::Mat value)
     {
+        std::lock_guard<std::mutex> lock(this->data_mutex);
         this->value = value;
         this->width = value.cols;
         this->height = value.rows;
@@ -130,48 +144,11 @@ public:
 
     std::vector<uint8_t> get_value()
     {
+        std::lock_guard<std::mutex> lock(this->data_mutex);
         std::vector<uchar> result;
-        cv::imencode(".jpg", this->value.load(), result);
+        cv::imencode(".jpg", this->value, result);
         return result;
     }
-};
-
-class SocketInit;
-class ListenPort;
-class TalkPort;
-
-class ConnectionHelper
-{
-public:
-    ConnectionHelper(Shufflecad* shufflecad, Robot* robot);
-    ~ConnectionHelper();
-
-    void stop();
-
-    std::mutex data_mutex; // for variables_array and print_array safety
-
 private:
-    Shufflecad* shufflecad;
-    Robot* robot;
-
-    TalkPort* out_variables_channel;
-    ListenPort* in_variables_channel;
-    TalkPort* chart_variables_channel;
-    TalkPort* outcad_variables_channel;
-    TalkPort* rpi_variables_channel;
-    TalkPort* camera_variables_channel;
-    ListenPort* joy_variables_channel;
-
-    SocketInit net_guard;
-    std::atomic<int> camera_toggler = 0;
-
-    void start();
-
-    void on_out_vars();
-    void on_in_vars();
-    void on_chart_vars();
-    void on_outcad_vars();
-    void on_rpi_vars();
-    void on_camera_vars();
-    void on_joy_vars();
+    std::mutex data_mutex;
 };

@@ -9,100 +9,6 @@
 #include <atomic>
 #include <mutex>
 
-StudicaInternal::StudicaInternal(Robot* robot, RobotConfiguration* conf) : robot(robot) 
-{
-    if (robot->on_real_robot) 
-    {
-        updater = new RpiUpdater(robot);
-        connection = new ConnectionReal(robot, updater, conf);
-        titan_com = new TitanCOMStudica();
-        titan_com->start_com((ConnectionReal*)connection, robot, this, (DefaultStudicaConfiguration*)conf);
-        vmx_spi = new VMXSPIStudica();
-        vmx_spi->start_spi((ConnectionReal*)connection, robot, this, (DefaultStudicaConfiguration*)conf);
-    } 
-    else 
-    {
-        connection = new ConnectionSim(robot);
-        robocad_connection = new RobocadConnectionStudica();
-        robocad_connection->start((ConnectionSim*)connection, robot, this);
-    }
-}
-
-StudicaInternal::~StudicaInternal() 
-{
-    delete connection;
-    connection = NULL;
-    delete updater;
-    updater = NULL;
-
-    if (robot->on_real_robot) 
-    {
-        delete titan_com;
-        titan_com = NULL;
-        delete vmx_spi;
-        vmx_spi = NULL;
-    } 
-    else 
-    {
-        delete robocad_connection;
-        robocad_connection = NULL;
-    }
-}
-
-void StudicaInternal::stop() 
-{
-    connection->stop();
-}
-
-cv::Mat StudicaInternal::get_camera() 
-{
-    return connection->get_camera();
-}
-
-std::vector<float> StudicaInternal::get_lidar() 
-{
-    return connection->get_lidar();
-}
-
-void StudicaInternal::set_servo_angle(float angle, int pin)
-{
-    double dut = 0.000666 * angle + 0.05;
-    hcdio_values[pin] = dut;
-    std::string cmd = std::to_string(HCDIO_CONST_ARRAY[pin]) + "=" + std::to_string(dut);
-    echo_to_file(cmd);
-}
-void StudicaInternal::set_led_state(bool state, int pin)
-{
-    hcdio_values[pin] = state ? 0.2f : 0.0f;
-    std::string cmd = std::to_string(HCDIO_CONST_ARRAY[pin]) + "=" + std::to_string(state ? 1.0f : 0.0f);
-    echo_to_file(cmd);
-}
-void StudicaInternal::set_servo_pwm(float pwm, int pin)
-{
-    double dut = pwm;
-    hcdio_values[pin] = dut;
-    std::string cmd = std::to_string(HCDIO_CONST_ARRAY[pin]) + "=" + std::to_string(dut);
-    echo_to_file(cmd);
-}
-void StudicaInternal::disable_servo(int pin)
-{
-    hcdio_values[pin] = 0.0f;
-    std::string cmd = std::to_string(HCDIO_CONST_ARRAY[pin]) + "=0.0";
-    echo_to_file(cmd);
-}
-void StudicaInternal::echo_to_file(std::string st) {
-    if (!robot->on_real_robot) {
-        return;
-    }
-
-    std::ofstream f("/dev/pi-blaster", std::ios::out | std::ios::app);
-    if (f.is_open()) {
-        f << st << std::endl;
-        f.close();
-    } else {
-        // std::cerr << "Error: Could not write to /dev/pi-blaster" << std::endl;
-    }
-}
 
 // --- Helpers ---
 
@@ -479,3 +385,100 @@ private:
         robot_internal->yaw_unlim = robot_internal->yaw_unlim + delta_yaw;
     }
 };
+
+// ------------- StudicaInternal -------------
+
+StudicaInternal::StudicaInternal(Robot* robot, RobotConfiguration* conf) : robot(robot) 
+{
+    if (robot->on_real_robot) 
+    {
+        updater = new RpiUpdater(robot);
+        connection = new ConnectionReal(robot, updater, conf);
+        titan_com = new TitanCOMStudica();
+        titan_com->start_com((ConnectionReal*)connection, robot, this, (DefaultStudicaConfiguration*)conf);
+        vmx_spi = new VMXSPIStudica();
+        vmx_spi->start_spi((ConnectionReal*)connection, robot, this, (DefaultStudicaConfiguration*)conf);
+    } 
+    else 
+    {
+        connection = new ConnectionSim(robot);
+        robocad_connection = new RobocadConnectionStudica();
+        robocad_connection->start((ConnectionSim*)connection, robot, this);
+    }
+}
+
+StudicaInternal::~StudicaInternal() 
+{
+    delete connection;
+    connection = NULL;
+    delete updater;
+    updater = NULL;
+
+    if (robot->on_real_robot) 
+    {
+        delete titan_com;
+        titan_com = NULL;
+        delete vmx_spi;
+        vmx_spi = NULL;
+    } 
+    else 
+    {
+        delete robocad_connection;
+        robocad_connection = NULL;
+    }
+}
+
+void StudicaInternal::stop() 
+{
+    connection->stop();
+}
+
+cv::Mat StudicaInternal::get_camera() 
+{
+    return connection->get_camera();
+}
+
+std::vector<float> StudicaInternal::get_lidar() 
+{
+    return connection->get_lidar();
+}
+
+void StudicaInternal::set_servo_angle(float angle, int pin)
+{
+    double dut = 0.000666 * angle + 0.05;
+    hcdio_values[pin] = dut;
+    std::string cmd = std::to_string(HCDIO_CONST_ARRAY[pin]) + "=" + std::to_string(dut);
+    echo_to_file(cmd);
+}
+void StudicaInternal::set_led_state(bool state, int pin)
+{
+    hcdio_values[pin] = state ? 0.2f : 0.0f;
+    std::string cmd = std::to_string(HCDIO_CONST_ARRAY[pin]) + "=" + std::to_string(state ? 1.0f : 0.0f);
+    echo_to_file(cmd);
+}
+void StudicaInternal::set_servo_pwm(float pwm, int pin)
+{
+    double dut = pwm;
+    hcdio_values[pin] = dut;
+    std::string cmd = std::to_string(HCDIO_CONST_ARRAY[pin]) + "=" + std::to_string(dut);
+    echo_to_file(cmd);
+}
+void StudicaInternal::disable_servo(int pin)
+{
+    hcdio_values[pin] = 0.0f;
+    std::string cmd = std::to_string(HCDIO_CONST_ARRAY[pin]) + "=0.0";
+    echo_to_file(cmd);
+}
+void StudicaInternal::echo_to_file(std::string st) {
+    if (!robot->on_real_robot) {
+        return;
+    }
+
+    std::ofstream f("/dev/pi-blaster", std::ios::out | std::ios::app);
+    if (f.is_open()) {
+        f << st << std::endl;
+        f.close();
+    } else {
+        // std::cerr << "Error: Could not write to /dev/pi-blaster" << std::endl;
+    }
+}

@@ -8,82 +8,8 @@
 #include <thread>
 #include <atomic>
 #include <mutex>
+#include <algorithm>
 
-AlgaritmInternal::AlgaritmInternal(Robot* robot, RobotConfiguration* conf) : robot(robot) 
-{
-    if (robot->on_real_robot) 
-    {
-        updater = new RpiUpdater(robot);
-        connection = new ConnectionReal(robot, updater, conf);
-        titan_com = new TitanCOMAlgaritm();
-        titan_com->start_com((ConnectionReal*)connection, robot, this, (DefaultAlgaritmConfiguration*)conf);
-        vmx_spi = new VMXSPIAlgaritm();
-        vmx_spi->start_spi((ConnectionReal*)connection, robot, this, (DefaultAlgaritmConfiguration*)conf);
-    } 
-    else 
-    {
-        connection = new ConnectionSim(robot);
-        robocad_connection = new RobocadConnectionAlgaritm();
-        robocad_connection->start((ConnectionSim*)connection, robot, this);
-    }
-}
-
-AlgaritmInternal::~AlgaritmInternal() 
-{
-    delete connection;
-    connection = NULL;
-    delete updater;
-    updater = NULL;
-
-    if (robot->on_real_robot) 
-    {
-        delete titan_com;
-        titan_com = NULL;
-        delete vmx_spi;
-        vmx_spi = NULL;
-    } 
-    else 
-    {
-        delete robocad_connection;
-        robocad_connection = NULL;
-    }
-}
-
-void AlgaritmInternal::stop() 
-{
-    connection->stop();
-}
-
-cv::Mat AlgaritmInternal::get_camera() 
-{
-    return connection->get_camera();
-}
-
-std::vector<float> AlgaritmInternal::get_lidar() 
-{
-    return connection->get_lidar();
-}
-
-void AlgaritmInternal::set_servo_angle(float angle, int pin)
-{
-    servo_angles[pin] = angle;
-}
-
-void AlgaritmInternal::step_motor_move(int num, int steps, int steps_per_second, bool direction)
-{
-    if (num == 1)
-    {
-        step_motor_1_steps = steps;
-        step_motor_1_steps_per_s = steps_per_second;
-        step_motor_1_direction = direction;
-    }
-    else if (num == 2)
-    {
-        step_motor_2_steps = steps;
-        step_motor_2_steps_per_s = steps_per_second;
-        step_motor_2_direction = direction;
-    }
-}
 
 // --- Helpers ---
 
@@ -433,3 +359,82 @@ private:
         return delta_angle;
     }
 };
+
+// ------------- AlgaritmInternal -------------
+
+AlgaritmInternal::AlgaritmInternal(Robot* robot, RobotConfiguration* conf) : robot(robot) 
+{
+    if (robot->on_real_robot) 
+    {
+        updater = new RpiUpdater(robot);
+        connection = new ConnectionReal(robot, updater, conf);
+        titan_com = new TitanCOMAlgaritm();
+        titan_com->start_com((ConnectionReal*)connection, robot, this, (DefaultAlgaritmConfiguration*)conf);
+        vmx_spi = new VMXSPIAlgaritm();
+        vmx_spi->start_spi((ConnectionReal*)connection, robot, this, (DefaultAlgaritmConfiguration*)conf);
+    } 
+    else 
+    {
+        connection = new ConnectionSim(robot);
+        robocad_connection = new RobocadConnectionAlgaritm();
+        robocad_connection->start((ConnectionSim*)connection, robot, this);
+    }
+}
+
+AlgaritmInternal::~AlgaritmInternal() 
+{
+    delete connection;
+    connection = NULL;
+    delete updater;
+    updater = NULL;
+
+    if (robot->on_real_robot) 
+    {
+        delete titan_com;
+        titan_com = NULL;
+        delete vmx_spi;
+        vmx_spi = NULL;
+    } 
+    else 
+    {
+        delete robocad_connection;
+        robocad_connection = NULL;
+    }
+}
+
+void AlgaritmInternal::stop() 
+{
+    connection->stop();
+}
+
+cv::Mat AlgaritmInternal::get_camera() 
+{
+    return connection->get_camera();
+}
+
+std::vector<float> AlgaritmInternal::get_lidar() 
+{
+    return connection->get_lidar();
+}
+
+void AlgaritmInternal::set_servo_angle(float angle, int pin)
+{
+    servo_angles[pin] = angle;
+}
+
+void AlgaritmInternal::step_motor_move(int num, int steps, int steps_per_second, bool direction)
+{
+    if (num == 1)
+    {
+        step_motor_1_steps = steps;
+        step_motor_1_steps_per_s = steps_per_second;
+        step_motor_1_direction = direction;
+    }
+    else if (num == 2)
+    {
+        step_motor_2_steps = steps;
+        step_motor_2_steps_per_s = steps_per_second;
+        step_motor_2_direction = direction;
+    }
+}
+

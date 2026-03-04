@@ -11,6 +11,10 @@ Updater::Updater(Robot* r)
 	robot = r;
 }
 
+void Updater::updater()
+{
+}
+
 RpiUpdater::RpiUpdater(Robot* r) : Updater(r)
 {
 }

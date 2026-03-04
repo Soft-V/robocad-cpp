@@ -49,11 +49,52 @@ public:
     }
 };
 
+class Shufflecad;
+class SocketInit;
+class ListenPort;
+class TalkPort;
+
+class ConnectionHelper
+{
+public:
+    ConnectionHelper(Shufflecad* shufflecad, Robot* robot);
+    ~ConnectionHelper();
+
+    void stop();
+
+    std::mutex data_mutex; // for variables_array and print_array safety
+
+private:
+    Shufflecad* shufflecad;
+    Robot* robot;
+
+    TalkPort* out_variables_channel;
+    ListenPort* in_variables_channel;
+    TalkPort* chart_variables_channel;
+    TalkPort* outcad_variables_channel;
+    TalkPort* rpi_variables_channel;
+    TalkPort* camera_variables_channel;
+    ListenPort* joy_variables_channel;
+
+    SocketInit net_guard;
+    std::atomic<int> camera_toggler = 0;
+
+    void start();
+
+    void on_out_vars();
+    void on_in_vars();
+    void on_chart_vars();
+    void on_outcad_vars();
+    void on_rpi_vars();
+    void on_camera_vars();
+    void on_joy_vars();
+};
+
 // global ini
 static SocketInit _g_socket_init;
 
-Shufflecad* current_instance = nullptr;
-void handler(int signum)
+static Shufflecad* current_instance = nullptr;
+static void handler(int signum)
 {
     current_instance->robot->write_log("Program stopped from handler");
     current_instance->robot->write_log("Signal handler called with signal " + std::to_string(signum));
@@ -342,10 +383,10 @@ void ConnectionHelper::on_out_vars() {
     std::lock_guard<std::mutex> lock(data_mutex);
     std::vector<std::string> segments;
     
-    for (auto var : shufflecad->variables_array) {
+    for (ShuffleVariable* var : shufflecad->variables_array) {
         if (var->type != ShuffleVariable::CHART_TYPE) {
             // name;value;type;direction
-            std::string s = var->name + ";" + var->value.load() + ";" + var->type + ";" + var->direction;
+            std::string s = var->name + ";" + var->value + ";" + var->type + ";" + var->direction;
             segments.push_back(s);
         }
     }
@@ -363,7 +404,7 @@ void ConnectionHelper::on_in_vars() {
             if (parts.size() == 2) {
                 std::string name = parts[0];
                 std::string value = parts[1];
-                for (auto& var : shufflecad->variables_array) {
+                for (ShuffleVariable* var : shufflecad->variables_array) {
                     if (var->name == name) {
                         var->value = value;
                         break;
@@ -377,9 +418,9 @@ void ConnectionHelper::on_in_vars() {
 void ConnectionHelper::on_chart_vars() {
     std::lock_guard<std::mutex> lock(data_mutex);
     std::vector<std::string> segments;
-    for (auto var : shufflecad->variables_array) {
+    for (ShuffleVariable* var : shufflecad->variables_array) {
         if (var->type == ShuffleVariable::CHART_TYPE) {
-            segments.push_back(var->name + ";" + var->value.load());
+            segments.push_back(var->name + ";" + var->value);
         }
     }
     chart_variables_channel->out_string = segments.empty() ? "null" : join(segments, "&");
@@ -435,7 +476,7 @@ void ConnectionHelper::on_camera_vars() {
         final_idx = requested_idx % shufflecad->camera_variables_array.size();
     }
 
-    auto curr_var = shufflecad->camera_variables_array[final_idx];
+    CameraVariable* curr_var = shufflecad->camera_variables_array[final_idx];
     
     // name;width:height
     std::string shape_str = std::to_string(curr_var->width) + ":" + std::to_string(curr_var->height);

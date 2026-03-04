@@ -53,7 +53,7 @@ static SocketInit _g_socket_init;
 
 // --- Helpers ---
 
-bool send_all(socket_t s, const void* data, size_t size) {
+static bool send_all(socket_t s, const void* data, size_t size) {
     const char* ptr = static_cast<const char*>(data);
     while (size > 0) {
         int sent = send(s, ptr, (int)size, 0);
@@ -64,7 +64,7 @@ bool send_all(socket_t s, const void* data, size_t size) {
     return true;
 }
 
-bool recv_all(socket_t s, void* data, size_t size) {
+static bool recv_all(socket_t s, void* data, size_t size) {
     char* ptr = static_cast<char*>(data);
     while (size > 0) {
         int rcvd = recv(s, ptr, (int)size, 0);
