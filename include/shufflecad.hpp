@@ -156,8 +156,17 @@ public:
     std::vector<uint8_t> get_value()
     {
         std::lock_guard<std::mutex> lock(this->data_mutex);
+        // No frame yet (e.g. robot has no camera, or none captured so far):
+        // cv::imencode throws on an empty Mat, which would propagate out of the
+        // camera thread and terminate the whole program. Send a "null" placeholder.
+        if (this->value.empty())
+            return { 'n', 'u', 'l', 'l' };
         std::vector<uchar> result;
-        cv::imencode(".jpg", this->value, result);
+        try {
+            cv::imencode(".jpg", this->value, result);
+        } catch (const cv::Exception&) {
+            return { 'n', 'u', 'l', 'l' };
+        }
         return result;
     }
 private:

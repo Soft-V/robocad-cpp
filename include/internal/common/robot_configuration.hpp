@@ -30,7 +30,7 @@ class DefaultAlgaritmConfiguration : public RobotConfiguration
 {
 public:
     DefaultAlgaritmConfiguration() {
-        camera_index = 2;
+        camera_index = 0;
         with_pi_blaster = false;
     }
 
