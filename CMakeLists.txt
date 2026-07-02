@@ -27,7 +27,9 @@ add_library (robocad-cpp SHARED
     "src/internal/common/updaters.cpp" 
 )
 
-target_link_options(robocad-cpp PRIVATE "LINKER:/NODEFAULTLIB:library")
+if (MSVC)
+  target_link_options(robocad-cpp PRIVATE "LINKER:/NODEFAULTLIB:library")
+endif()
 target_link_libraries(robocad-cpp PRIVATE ${OpenCV_LIBS})
 target_link_libraries(robocad-cpp PRIVATE Threads::Threads)
 

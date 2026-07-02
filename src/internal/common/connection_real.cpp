@@ -12,6 +12,11 @@ ConnectionReal::ConnectionReal(Robot* robot, Updater* updater, RobotConfiguratio
     try
     {
         camera_instance = new cv::VideoCapture(conf->camera_index);
+        if (camera_instance->isOpened())
+            robot->write_log("Camera opened on index " + std::to_string(conf->camera_index));
+        else
+            robot->write_log("Camera FAILED to open on index " + std::to_string(conf->camera_index) +
+                             " (VideoCapture did not throw, but device is not available)");
     }
     catch (const std::exception& e)
     {
