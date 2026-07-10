@@ -556,11 +556,6 @@ void AlgaritmInternal::set_servo_angle(float angle, int pin)
     servo_angles[pin] = angle;
 }
 
-void AlgaritmInternal::set_output(int pin, bool value)
-{
-    if (pin >= 0 && pin < 4) outputs[pin] = value;
-}
-
 void AlgaritmInternal::step_motor_move(int num, int steps, int steps_per_second, bool direction)
 {
     if (num == 1)
