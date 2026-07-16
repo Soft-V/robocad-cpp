@@ -491,11 +491,34 @@ void ConnectionHelper::on_joy_vars() {
         auto string_vars = split(data, '&');
         for (const auto& item : string_vars) {
             auto parts = split(item, ';');
-            if (parts.size() == 2) {
-                try {
-                    shufflecad->joystick_values[parts[0]] = std::stoi(parts[1]);
-                } catch (...) {}
+            if (parts.size() != 2) continue;
+
+            int val;
+            try {
+                val = std::stoi(parts[1]);
+            } catch (...) {
+                continue;
             }
+
+            const std::string& key = parts[0];
+            JoystickData& joy = shufflecad->joystick_data;
+
+            if (key == "A") joy.btn_a = val == 1;
+            else if (key == "B") joy.btn_b = val == 1;
+            else if (key == "X") joy.btn_x = val == 1;
+            else if (key == "Y") joy.btn_y = val == 1;
+            else if (key == "RightShoulder") joy.right_shoulder = val == 1;
+            else if (key == "LeftShoulder") joy.left_shoulder = val == 1;
+            else if (key == "DPad_Up") joy.dpad_up = val == 1;
+            else if (key == "DPad_Down") joy.dpad_down = val == 1;
+            else if (key == "DPad_Right") joy.dpad_right = val == 1;
+            else if (key == "DPad_Left") joy.dpad_left = val == 1;
+            else if (key == "LeftTrigger") joy.left_trigger = static_cast<uint8_t>(val);
+            else if (key == "RightTrigger") joy.right_trigger = static_cast<uint8_t>(val);
+            else if (key == "LeftThumbstick_X") joy.left_stick_x = val;
+            else if (key == "LeftThumbstick_Y") joy.left_stick_y = val;
+            else if (key == "RightThumbstick_X") joy.right_stick_x = val;
+            else if (key == "RightThumbstick_Y") joy.right_stick_y = val;
         }
     }
 }

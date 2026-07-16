@@ -12,10 +12,37 @@
 #include <map>
 #include <string>
 #include <algorithm>
+#include <cstdint>
 
 class ShuffleVariable;
 class CameraVariable;
 class ConnectionHelper;
+
+class JoystickData
+{
+public:
+    std::atomic<bool> btn_a{false};
+    std::atomic<bool> btn_b{false};
+    std::atomic<bool> btn_x{false};
+    std::atomic<bool> btn_y{false};
+
+    std::atomic<bool> dpad_up{false};
+    std::atomic<bool> dpad_down{false};
+    std::atomic<bool> dpad_left{false};
+    std::atomic<bool> dpad_right{false};
+
+    std::atomic<uint8_t> right_trigger{0};
+    std::atomic<uint8_t> left_trigger{0};
+
+    std::atomic<int> right_stick_x{0};
+    std::atomic<int> right_stick_y{0};
+
+    std::atomic<int> left_stick_x{0};
+    std::atomic<int> left_stick_y{0};
+
+    std::atomic<bool> right_shoulder{false};
+    std::atomic<bool> left_shoulder{false};
+};
 
 class Shufflecad
 {
@@ -38,8 +65,8 @@ public:
 
     std::vector<ShuffleVariable*> variables_array;
     std::vector<CameraVariable*> camera_variables_array;
-    std::map<std::string, float> joystick_values;
-    
+    JoystickData joystick_data;
+
     std::vector<std::string> print_array;
     std::vector<std::string> get_print_array();
     void clear_print_array();
