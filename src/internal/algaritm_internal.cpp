@@ -261,6 +261,9 @@ private:
 
                 robot_internal->is_step_1_busy = (data[18] != 0);
                 robot_internal->is_step_2_busy = (data[19] != 0);
+
+                if (robot_internal->is_step_1_busy) robot_internal->step_motor_reset(1);
+                if (robot_internal->is_step_2_busy) robot_internal->step_motor_reset(2);
             }
         }
         else
@@ -569,6 +572,22 @@ void AlgaritmInternal::step_motor_move(int num, int steps, int steps_per_second,
         step_motor_2_steps = steps;
         step_motor_2_steps_per_s = steps_per_second;
         step_motor_2_direction = direction;
+    }
+}
+
+void AlgaritmInternal::step_motor_reset(int num)
+{
+    if (num == 1)
+    {
+        step_motor_1_steps = 0;
+        step_motor_1_steps_per_s = 0;
+        step_motor_1_direction = false;
+    }
+    else if (num == 2)
+    {
+        step_motor_2_steps = 0;
+        step_motor_2_steps_per_s = 0;
+        step_motor_2_direction = false;
     }
 }
 
