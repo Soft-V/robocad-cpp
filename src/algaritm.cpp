@@ -60,19 +60,36 @@ void RobotAlgaritm::set_motor_speed_3(float speed)
 
 int32_t RobotAlgaritm::get_motor_enc_0()
 {
-    return algaritm_internal->enc_motor_0;
+    return algaritm_internal->enc_motor_0 - enc_reset_0;
 }
 int32_t RobotAlgaritm::get_motor_enc_1()
 {
-    return algaritm_internal->enc_motor_1;
+    return algaritm_internal->enc_motor_1 - enc_reset_1;
 }
 int32_t RobotAlgaritm::get_motor_enc_2()
 {
-    return algaritm_internal->enc_motor_2;
+    return algaritm_internal->enc_motor_2 - enc_reset_2;
 }
 int32_t RobotAlgaritm::get_motor_enc_3()
 {
-    return algaritm_internal->enc_motor_3;
+    return algaritm_internal->enc_motor_3 - enc_reset_3;
+}
+
+void RobotAlgaritm::reset_motor_enc_0()
+{
+    enc_reset_0 = algaritm_internal->enc_motor_0.load();
+}
+void RobotAlgaritm::reset_motor_enc_1()
+{
+    enc_reset_1 = algaritm_internal->enc_motor_1.load();
+}
+void RobotAlgaritm::reset_motor_enc_2()
+{
+    enc_reset_2 = algaritm_internal->enc_motor_2.load();
+}
+void RobotAlgaritm::reset_motor_enc_3()
+{
+    enc_reset_3 = algaritm_internal->enc_motor_3.load();
 }
 
 float RobotAlgaritm::get_yaw()

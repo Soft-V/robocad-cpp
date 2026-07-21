@@ -45,14 +45,23 @@ void CommonRobot::set_motor_speed_5(float speed) { common_internal->speed_motor_
 void CommonRobot::set_motor_speed_6(float speed) { common_internal->speed_motor_6 = speed; }
 void CommonRobot::set_motor_speed_7(float speed) { common_internal->speed_motor_7 = speed; }
 
-int32_t CommonRobot::get_motor_enc_0() { return common_internal->enc_motor_0; }
-int32_t CommonRobot::get_motor_enc_1() { return common_internal->enc_motor_1; }
-int32_t CommonRobot::get_motor_enc_2() { return common_internal->enc_motor_2; }
-int32_t CommonRobot::get_motor_enc_3() { return common_internal->enc_motor_3; }
-int32_t CommonRobot::get_motor_enc_4() { return common_internal->enc_motor_4; }
-int32_t CommonRobot::get_motor_enc_5() { return common_internal->enc_motor_5; }
-int32_t CommonRobot::get_motor_enc_6() { return common_internal->enc_motor_6; }
-int32_t CommonRobot::get_motor_enc_7() { return common_internal->enc_motor_7; }
+int32_t CommonRobot::get_motor_enc_0() { return common_internal->enc_motor_0 - enc_reset_0; }
+int32_t CommonRobot::get_motor_enc_1() { return common_internal->enc_motor_1 - enc_reset_1; }
+int32_t CommonRobot::get_motor_enc_2() { return common_internal->enc_motor_2 - enc_reset_2; }
+int32_t CommonRobot::get_motor_enc_3() { return common_internal->enc_motor_3 - enc_reset_3; }
+int32_t CommonRobot::get_motor_enc_4() { return common_internal->enc_motor_4 - enc_reset_4; }
+int32_t CommonRobot::get_motor_enc_5() { return common_internal->enc_motor_5 - enc_reset_5; }
+int32_t CommonRobot::get_motor_enc_6() { return common_internal->enc_motor_6 - enc_reset_6; }
+int32_t CommonRobot::get_motor_enc_7() { return common_internal->enc_motor_7 - enc_reset_7; }
+
+void CommonRobot::reset_motor_enc_0() { enc_reset_0 = common_internal->enc_motor_0.load(); }
+void CommonRobot::reset_motor_enc_1() { enc_reset_1 = common_internal->enc_motor_1.load(); }
+void CommonRobot::reset_motor_enc_2() { enc_reset_2 = common_internal->enc_motor_2.load(); }
+void CommonRobot::reset_motor_enc_3() { enc_reset_3 = common_internal->enc_motor_3.load(); }
+void CommonRobot::reset_motor_enc_4() { enc_reset_4 = common_internal->enc_motor_4.load(); }
+void CommonRobot::reset_motor_enc_5() { enc_reset_5 = common_internal->enc_motor_5.load(); }
+void CommonRobot::reset_motor_enc_6() { enc_reset_6 = common_internal->enc_motor_6.load(); }
+void CommonRobot::reset_motor_enc_7() { enc_reset_7 = common_internal->enc_motor_7.load(); }
 
 float CommonRobot::get_yaw() { return common_internal->yaw; }
 float CommonRobot::get_us1() { return common_internal->ultrasound_1; }
