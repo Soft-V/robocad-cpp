@@ -31,6 +31,11 @@ public:
     int32_t get_motor_enc_2();
     int32_t get_motor_enc_3();
 
+    void reset_motor_enc_0();
+    void reset_motor_enc_1();
+    void reset_motor_enc_2();
+    void reset_motor_enc_3();
+
     float get_yaw();
     void reset_yaw();
     float get_pitch();
@@ -74,6 +79,8 @@ private:
     float reseted_yaw_val;
     float reseted_pitch_val;
     float reseted_roll_val;
+
+    std::atomic<int32_t> enc_reset_0{0}, enc_reset_1{0}, enc_reset_2{0}, enc_reset_3{0};
 
     DefaultAlgaritmConfiguration* createDefaultConfIfNull(DefaultAlgaritmConfiguration* conf)
     {

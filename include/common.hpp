@@ -5,6 +5,7 @@
 
 #include <opencv2/opencv.hpp>
 
+#include <atomic>
 #include <vector>
 
 // Port of robocad-py CommonRobot (common.py). Simulator-only.
@@ -34,6 +35,15 @@ public:
     int32_t get_motor_enc_5();
     int32_t get_motor_enc_6();
     int32_t get_motor_enc_7();
+
+    void reset_motor_enc_0();
+    void reset_motor_enc_1();
+    void reset_motor_enc_2();
+    void reset_motor_enc_3();
+    void reset_motor_enc_4();
+    void reset_motor_enc_5();
+    void reset_motor_enc_6();
+    void reset_motor_enc_7();
 
     float get_yaw();
     void reset_yaw();
@@ -66,6 +76,9 @@ private:
     DefaultCommonConfiguration* conf_internal;
     CommonRobotInternal* common_internal;
     float reseted_yaw_val;
+
+    std::atomic<int32_t> enc_reset_0{0}, enc_reset_1{0}, enc_reset_2{0}, enc_reset_3{0};
+    std::atomic<int32_t> enc_reset_4{0}, enc_reset_5{0}, enc_reset_6{0}, enc_reset_7{0};
 
     DefaultCommonConfiguration* createDefaultConfIfNull(DefaultCommonConfiguration* conf)
     {
