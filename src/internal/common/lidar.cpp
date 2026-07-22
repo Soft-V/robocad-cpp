@@ -15,11 +15,6 @@
 #include <unistd.h>
 #endif
 
-const int YDLidarX2::MIN_RANGE = 10;
-const int YDLidarX2::MAX_RANGE = 8000;
-const int YDLidarX2::MAX_DATA = 20;
-const int YDLidarX2::OUT_OF_RANGE = 32768;
-
 // Port of robocad-py YDLidarX2 (lidar.py). See header for the caveat.
 
 YDLidarX2::YDLidarX2(Robot* robot, std::string port, int chunk_size)

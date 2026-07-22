@@ -26,13 +26,13 @@ public:
     void stop() override;
 
 private:
-    static const uint8_t PKG_HEADER_0 = 0xA5;
-    static const uint8_t PKG_HEADER_1 = 0x5A;
-    static const int MIN_PAYLOAD = 58;
-    static const int POINT_PER_PACK = 16;
+    static constexpr uint8_t PKG_HEADER_0 = 0xA5;
+    static constexpr uint8_t PKG_HEADER_1 = 0x5A;
+    static constexpr int MIN_PAYLOAD = 58;
+    static constexpr int POINT_PER_PACK = 16;
 
     // Drop the backlog if parsing falls this far behind the sensor.
-    static const int MAX_BUFFERED_PACKETS = 100;
+    static constexpr int MAX_BUFFERED_PACKETS = 100;
 
     Robot* robot;
     std::string port;

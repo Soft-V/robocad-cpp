@@ -41,10 +41,10 @@ private:
     std::atomic<bool> is_scanning{false};
     std::atomic<bool> scan_is_active{false};
 
-    static const int MIN_RANGE = 10;
-    static const int MAX_RANGE = 8000;
-    static const int MAX_DATA = 20;
-    static const int OUT_OF_RANGE = 32768;
+    static constexpr int MIN_RANGE = 10;
+    static constexpr int MAX_RANGE = 8000;
+    static constexpr int MAX_DATA = 20;
+    static constexpr int OUT_OF_RANGE = 32768;
 
     std::thread scan_thread;
     std::mutex data_mutex;
