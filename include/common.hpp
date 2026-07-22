@@ -1,7 +1,7 @@
 #pragma once
 
-#include "common/robot.hpp"
-#include "common_internal.hpp"
+#include "internal/common/robot.hpp"
+#include "internal/common_internal.hpp"
 
 #include <opencv2/opencv.hpp>
 
