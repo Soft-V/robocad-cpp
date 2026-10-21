@@ -33,8 +33,8 @@ private:
     RobotConfiguration* conf;
     LibHolder* lib_holder;
 
-    cv::VideoCapture* camera_instance;
-    LidarBase* lidar_instance;
+    cv::VideoCapture* camera_instance = nullptr;
+    LidarBase* lidar_instance = nullptr;
 
-    std::thread* robot_info_thread;
+    std::thread* robot_info_thread = nullptr;
 };

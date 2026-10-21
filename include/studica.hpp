@@ -17,6 +17,7 @@ public:
     RobotVmxTitan(bool is_real_robot = false, DefaultStudicaConfiguration* conf = nullptr);
     ~RobotVmxTitan();
 
+    // Drives all HCDIO signals LOW. Servo torque release depends on its electronics.
     void stop();
     cv::Mat get_camera();
     std::vector<float> get_lidar();

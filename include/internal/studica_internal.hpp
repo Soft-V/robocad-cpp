@@ -5,6 +5,9 @@
 #include "common/updaters.hpp"
 #include "common/shared.hpp"
 #include "common/robot_configuration.hpp"
+#include "common/pigpio_pwm.hpp"
+#include <memory>
+#include <mutex>
 
 class RobocadConnectionStudica;
 class TitanCOMStudica;
@@ -48,5 +51,8 @@ private:
     TitanCOMStudica* titan_com;
     VMXSPIStudica* vmx_spi;
 
-    void echo_to_file(std::string s);
+    std::unique_ptr<PigpioPWM> pwm;
+    std::mutex hcdio_mutex;
+    bool stopped = false;
+    void set_hcdio_duty(double duty, int pin);
 };

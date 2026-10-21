@@ -8,7 +8,10 @@ static void handler(int signum)
 {
     current_instance->write_log("Program stopped from handler");
     current_instance->write_log("Signal handler called with signal " + std::to_string(signum));
-    current_instance->stop();
+    try { current_instance->stop(); }
+    catch (const std::exception& error) {
+        fprintf(stderr, "Robot stop failed: %s\n", error.what());
+    }
     exit(signum);
 }
 

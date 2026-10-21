@@ -36,11 +36,6 @@ ConnectionReal::ConnectionReal(Robot* robot, Updater* updater, RobotConfiguratio
         robot->write_log(std::string("Error while creating lidar instance: ") + e.what());
     }
 
-    // pi-blaster
-    if (conf->with_pi_blaster)
-    {
-        system("sudo /home/pi/pi-blaster/pi-blaster --pcm");
-    }
     // robot info thread (kept joinable so stop()/destructor can join it)
     robot_info_thread = new std::thread(&Updater::updater, updater);
 }
@@ -66,6 +61,7 @@ void ConnectionReal::stop()
     if (lidar_instance)
         lidar_instance->stop();
 
+    if (camera_instance) camera_instance->release();
     updater->stop_robot_info_thread = true;
     if (robot_info_thread && robot_info_thread->joinable())
         robot_info_thread->join();

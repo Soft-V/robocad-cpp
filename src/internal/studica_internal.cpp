@@ -8,6 +8,8 @@
 #include <thread>
 #include <atomic>
 #include <mutex>
+#include <stdexcept>
+#include <iostream>
 
 
 // --- Helpers ---
@@ -408,6 +410,10 @@ StudicaInternal::StudicaInternal(Robot* robot, RobotConfiguration* conf) : robot
 
     if (robot->on_real_robot)
     {
+        auto* studica_conf = static_cast<DefaultStudicaConfiguration*>(conf);
+        pwm = std::make_unique<PigpioPWM>(studica_conf->pigpio_pipe_path,
+            studica_conf->pigpio_response_path, studica_conf->hcdio_pwm_frequency,
+            studica_conf->pigpio_timeout);
         updater = new RpiUpdater(robot);
         connection = new ConnectionReal(robot, updater, conf);
         titan_com = new TitanCOMStudica();
@@ -425,8 +431,9 @@ StudicaInternal::StudicaInternal(Robot* robot, RobotConfiguration* conf) : robot
 
 StudicaInternal::~StudicaInternal()
 {
-    // stop worker threads BEFORE deleting the connection they use
-    stop();
+    // Explicit stop() reports errors; a destructor must not throw.
+    try { stop(); }
+    catch (const std::exception& error) { std::cerr << "Robot stop failed: " << error.what() << '\n'; }
 
     if (robot->on_real_robot)
     {
@@ -449,17 +456,23 @@ StudicaInternal::~StudicaInternal()
 
 void StudicaInternal::stop()
 {
-    // stop worker threads first so they no longer touch the connection
-    if (robot->on_real_robot)
     {
-        if (titan_com) titan_com->stop();
-        if (vmx_spi) vmx_spi->stop();
+        std::lock_guard<std::mutex> guard(hcdio_mutex);
+        stopped = true;
+        for (auto& value : hcdio_values) value = 0.0f;
     }
-    else
-    {
-        if (robocad_connection) robocad_connection->stop();
-    }
-    if (connection) connection->stop();
+    std::string errors;
+    const auto cleanup = [&](auto action) {
+        try { action(); }
+        catch (const std::exception& error) { errors += std::string(error.what()) + "; "; }
+    };
+    if (pwm) cleanup([&] { pwm->stop(std::vector<int>(HCDIO_CONST_ARRAY, HCDIO_CONST_ARRAY + 10)); });
+    // Attempt all cleanups, stopping workers before their connection.
+    if (titan_com) cleanup([&] { titan_com->stop(); });
+    if (vmx_spi) cleanup([&] { vmx_spi->stop(); });
+    if (robocad_connection) cleanup([&] { robocad_connection->stop(); });
+    if (connection) cleanup([&] { connection->stop(); });
+    if (!errors.empty()) throw std::runtime_error("Robot stop failed: " + errors);
 }
 
 cv::Mat StudicaInternal::get_camera() 
@@ -474,40 +487,30 @@ std::vector<float> StudicaInternal::get_lidar()
 
 void StudicaInternal::set_servo_angle(float angle, int pin)
 {
-    double dut = 0.000666 * angle + 0.05;
-    hcdio_values[pin] = dut;
-    std::string cmd = std::to_string(HCDIO_CONST_ARRAY[pin]) + "=" + std::to_string(dut);
-    echo_to_file(cmd);
+    set_hcdio_duty(0.000666 * angle + 0.05, pin);
 }
+
 void StudicaInternal::set_led_state(bool state, int pin)
 {
-    hcdio_values[pin] = state ? 0.2f : 0.0f;
-    std::string cmd = std::to_string(HCDIO_CONST_ARRAY[pin]) + "=" + std::to_string(state ? 1.0f : 0.0f);
-    echo_to_file(cmd);
+    set_hcdio_duty(state ? 0.2 : 0.0, pin);
 }
-void StudicaInternal::set_servo_pwm(float pwm, int pin)
+
+void StudicaInternal::set_servo_pwm(float duty, int pin)
 {
-    double dut = pwm;
-    hcdio_values[pin] = dut;
-    std::string cmd = std::to_string(HCDIO_CONST_ARRAY[pin]) + "=" + std::to_string(dut);
-    echo_to_file(cmd);
+    set_hcdio_duty(duty, pin);
 }
+
 void StudicaInternal::disable_servo(int pin)
 {
-    hcdio_values[pin] = 0.0f;
-    std::string cmd = std::to_string(HCDIO_CONST_ARRAY[pin]) + "=0.0";
-    echo_to_file(cmd);
+    set_hcdio_duty(0.0, pin);
 }
-void StudicaInternal::echo_to_file(std::string st) {
-    if (!robot->on_real_robot) {
-        return;
-    }
 
-    std::ofstream f("/dev/pi-blaster", std::ios::out | std::ios::app);
-    if (f.is_open()) {
-        f << st << std::endl;
-        f.close();
-    } else {
-        // std::cerr << "Error: Could not write to /dev/pi-blaster" << std::endl;
-    }
+void StudicaInternal::set_hcdio_duty(double duty, int pin)
+{
+    if (pin < 0 || pin >= 10) throw std::out_of_range("HCDIO port must be from 1 to 10");
+    if (!(duty >= 0 && duty <= 1)) throw std::invalid_argument("PWM duty cycle must be between 0 and 1");
+    std::lock_guard<std::mutex> guard(hcdio_mutex);
+    if (stopped && duty != 0) throw std::runtime_error("Robot has been stopped; HCDIO PWM cannot be enabled");
+    if (pwm) pwm->set_dutycycle(HCDIO_CONST_ARRAY[pin], duty);
+    hcdio_values[pin] = static_cast<float>(duty);
 }

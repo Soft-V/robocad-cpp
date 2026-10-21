@@ -9,7 +9,6 @@ class RobotConfiguration
 public:
     uint8_t camera_index = 0;
     std::string lib_holder_first_path = "/home/pi";
-    bool with_pi_blaster = true;
     LidarTypes lidar_type = LidarTypes::N10_LIDAR;
     std::string lidar_port = "/dev/ttyUSB0";
 
@@ -20,6 +19,11 @@ public:
 class DefaultStudicaConfiguration : public RobotConfiguration
 {
 public:
+    // pigpiod is managed by the OS, with its FIFO interface enabled.
+    std::string pigpio_pipe_path = "/dev/pigpio";
+    std::string pigpio_response_path = "/dev/pigout";
+    int hcdio_pwm_frequency = 100;
+    double pigpio_timeout = 1.0;
     std::string titan_port = "/dev/ttyACM0";
     uint32_t titan_baud = 115200;
     std::string vmx_port = "/dev/spidev1.2";
@@ -33,7 +37,6 @@ class DefaultAlgaritmConfiguration : public RobotConfiguration
 public:
     DefaultAlgaritmConfiguration() {
         camera_index = 0;
-        with_pi_blaster = false;
     }
 
     std::string titan_port = "/dev/ttyACM0";

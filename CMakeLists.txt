@@ -18,6 +18,7 @@ add_library (robocad-cpp SHARED
     "src/internal/studica_internal.cpp"
     "src/internal/algaritm_internal.cpp"
     "src/internal/common_internal.cpp"
+    "src/internal/common/pigpio_pwm.cpp"
     "src/internal/common/connection_base.cpp"
     "src/internal/common/connection_real.cpp" 
     "src/internal/common/connection_sim.cpp" 
