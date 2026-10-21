@@ -1,6 +1,6 @@
 ﻿cmake_minimum_required (VERSION 3.8)
 
-project ("robocad-cpp" VERSION 1.4.0)
+project ("robocad-cpp" VERSION 1.4.1)
 
 find_package(Threads REQUIRED)
 find_package(OpenCV REQUIRED )
